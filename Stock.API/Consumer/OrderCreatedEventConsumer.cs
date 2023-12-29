@@ -57,6 +57,10 @@ namespace Stock.API.Consumer
 
                 StockReservedEvent stockReservedEvent = new StockReservedEvent()
                 {
+                    PaymentMessage = context.Message.Payment,
+                    BuyerId = context.Message.BuyerId,
+                    OrderId = context.Message.OrderId,
+                    OrderItems = context.Message.OrderItemMessages
                 };
 
                 //eğer stock durumu başarılı mevcutsa her şey okeyse paymenta eventimizi gönderiyoruz.
