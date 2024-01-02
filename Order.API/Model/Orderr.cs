@@ -21,7 +21,7 @@
     public enum OrderStatus
     {
         Suspend,
-        Success,
+        Succeed,
         Fail
     }
 }

@@ -12,7 +12,7 @@ using Order.API.Model;
 namespace Order.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231228143004_Initial")]
+    [Migration("20240102125856_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -36,7 +36,7 @@ namespace Order.API.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int>("OrderrId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -47,7 +47,7 @@ namespace Order.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderrId");
 
                     b.ToTable("OrderItems");
                 });
@@ -79,13 +79,13 @@ namespace Order.API.Migrations
 
             modelBuilder.Entity("Order.API.Model.OrderItem", b =>
                 {
-                    b.HasOne("Order.API.Model.Orderr", "Order")
+                    b.HasOne("Order.API.Model.Orderr", "Orderr")
                         .WithMany("Items")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("OrderrId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("Orderr");
                 });
 
             modelBuilder.Entity("Order.API.Model.Orderr", b =>

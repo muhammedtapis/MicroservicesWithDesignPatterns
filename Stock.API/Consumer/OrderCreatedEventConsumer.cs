@@ -59,7 +59,7 @@ namespace Stock.API.Consumer
                 {
                     PaymentMessage = context.Message.Payment,
                     BuyerId = context.Message.BuyerId,
-                    OrderId = context.Message.OrderId,
+                    OrderrId = context.Message.OrderrId,
                     OrderItems = context.Message.OrderItemMessages
                 };
 
@@ -72,8 +72,9 @@ namespace Stock.API.Consumer
                 //eğer durum başarısız stock mevcut değilse bu sefer send etmiycez pubish edicez çünkü bu eventi birden fazla servis dinleyebilir.
                 await _publishEndpoint.Publish(new StockNotReservedEvent()
                 {
-                    OrderId = context.Message.OrderId,
-                    Message = "Stok yetersiz"
+                    OrderrId = context.Message.OrderrId,
+                    Message = "Stok yetersiz",
+                    OrderItems = context.Message.OrderItemMessages
                 });
 
                 _logger.LogInformation($" Buyer Id : {context.Message.BuyerId} Kullanıcısı için stock yetersiz ");

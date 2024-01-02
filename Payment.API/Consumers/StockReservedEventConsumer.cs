@@ -23,12 +23,12 @@ namespace Payment.API.Consumers
             if (balance > context.Message.PaymentMessage.TotalPrice)
             {
                 _logger.LogInformation($"Kullanıcı Id : {context.Message.BuyerId} , {context.Message.PaymentMessage.TotalPrice} TL kartınızdan çekildi");
-
+                var ordr = context.Message.OrderrId;
                 //publish et olumlu eventi
                 await _publishEndpoint.Publish(new PaymentSucceedEvent()
                 {
                     BuyerId = context.Message.BuyerId,
-                    OrderId = context.Message.OrderId,
+                    OrderrId = context.Message.OrderrId,
                 });
             }
             else
@@ -39,8 +39,9 @@ namespace Payment.API.Consumers
                 await _publishEndpoint.Publish(new PaymentFailedEvent()
                 {
                     BuyerId = context.Message.BuyerId,
-                    OrderId = context.Message.OrderId,
-                    Message = "Hesabınızdaki bakiye yetersiz."
+                    OrderrId = context.Message.OrderrId,
+                    Message = "Hesabınızdaki bakiye yetersiz.",
+                    OrderItems = context.Message.OrderItems,
                 });
             }
         }

@@ -1,6 +1,8 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Order.API.Consumers;
 using Order.API.Model;
+using SharedLibrary;
 using SharedLibrary.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,11 +11,26 @@ var builder = WebApplication.CreateBuilder(args);
 //masstransit
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<PaymentSucceedEventConsumer>(); //paymentten gelen eventi dinleyecek consumer !!
+    x.AddConsumer<PaymentFailedEventConsumer>();
+    x.AddConsumer<StockNotReservedEventConsumer>();
     //hangi mesagebroker kullanýcaz onu belirt.
     x.UsingRabbitMq((context, cfg) =>
+
     {
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); //hostunu tanýmla
-
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.OrderPaymentSucceedEventQueueName, e =>
+        {
+            e.ConfigureConsumer<PaymentSucceedEventConsumer>(context);
+        });
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.OrderPaymentFailedEventQueueName, e =>
+        {
+            e.ConfigureConsumer<PaymentFailedEventConsumer>(context);
+        });
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.OrderStockNotReservedEventQueueName, e =>
+        {
+            e.ConfigureConsumer<StockNotReservedEventConsumer>(context);
+        });
         //cfg.ConfigureEndpoints(context);
     });
 });

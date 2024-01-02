@@ -8,7 +8,7 @@ namespace SharedLibrary
 {
     public class PaymentSucceedEvent
     {
-        public int OrderId { get; set; } //hangi siparişin bu payment ?
-        public int BuyerId { get; set; }
+        public int OrderrId { get; set; } //hangi siparişin bu payment ?
+        public string BuyerId { get; set; }
     }
 }

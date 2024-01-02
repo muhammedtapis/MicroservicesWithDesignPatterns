@@ -13,8 +13,8 @@ namespace Order.API.Model
         public int Count { get; set; } //bu üründen kaç tane satın aldı
 
         //navigation prop her bir orderitem bir ordera ait
-        public int OrderId { get; set; } //orderid kime ait foreign key
+        public int OrderrId { get; set; } //orderid kime ait foreign key
 
-        public Orderr Order { get; set; }
+        public Orderr Orderr { get; set; }
     }
 }

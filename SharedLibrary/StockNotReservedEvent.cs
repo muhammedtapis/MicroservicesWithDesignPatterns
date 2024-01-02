@@ -9,8 +9,9 @@ namespace SharedLibrary
     //bunun subscriberi OrderApi
     public class StockNotReservedEvent
     {
-        public int OrderId { get; set; }
+        public int OrderrId { get; set; }
 
         public string Message { get; set; } //olumsuz durumu geri orderApi ye dönerken mesaj da göndermek isteyebiliriz.
+        public List<OrderItemMessage> OrderItems { get; set; } = new List<OrderItemMessage>();
     }
 }

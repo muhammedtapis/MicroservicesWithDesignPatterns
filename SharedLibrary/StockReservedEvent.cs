@@ -11,8 +11,8 @@ namespace SharedLibrary
     //payment servis dinleyecek subscribbe olacak o yüzden ödeme bilgilerini göndermen lazım.
     public class StockReservedEvent
     {
-        public int OrderId { get; set; } //hangi sipariş için
-        public int BuyerId { get; set; }
+        public int OrderrId { get; set; } //hangi sipariş için
+        public string BuyerId { get; set; }
         public PaymentMessage PaymentMessage { get; set; }
 
         //orderitem almamızın sebebi StockReservedEventi Payment yolladığımızda payment fail dönerse stoktan düştüğü ürünleri tekrar düzeltmek için

@@ -8,8 +8,9 @@ namespace SharedLibrary
 {
     public class PaymentFailedEvent
     {
-        public int OrderId { get; set; } //hangi siparişin bu payment ?
-        public int BuyerId { get; set; }
+        public int OrderrId { get; set; } //hangi siparişin bu payment ?
+        public string BuyerId { get; set; }
         public string Message { get; set; }
+        public List<OrderItemMessage> OrderItems { get; set; } = new List<OrderItemMessage>();
     }
 }

@@ -13,6 +13,7 @@ builder.Services.AddMassTransit(x =>
 {
     //consumer
     x.AddConsumer<OrderCreatedEventConsumer>();
+    x.AddConsumer<PaymentFailedEventConsumer>();
 
     //hangi mesagebroker kullanýcaz onu belirt.
     x.UsingRabbitMq((context, cfg) =>
@@ -22,6 +23,10 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockOrderCreatedEventQueueName, e =>
         {//e üzerinden bu kuyruðu hangi consumer dinleyecek onu belirtiyoruz.
             e.ConfigureConsumer<OrderCreatedEventConsumer>(context);
+        });
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockPaymentFailedEventQueueName, e =>
+        {//e üzerinden bu kuyruðu hangi consumer dinleyecek onu belirtiyoruz.
+            e.ConfigureConsumer<PaymentFailedEventConsumer>(context);
         });
     });
 });
