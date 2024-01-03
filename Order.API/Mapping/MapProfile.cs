@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
 using Order.API.DTO;
 using Order.API.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SharedLibrary.Events;
 
 namespace SharedLibrary.Mapping
 {
@@ -23,7 +19,7 @@ namespace SharedLibrary.Mapping
             CreateMap<OrderItem, OrderItemMessage>().ReverseMap();
 
             //maplerken property isimleri aynı olmazsa bu şekilde tek tek belirtmen lazım yoksa maplemiyor. birinde OrderrId diğerinde Id çünkü
-            CreateMap<Orderr, OrderCreatedEvent>().ForMember(x => x.OrderrId, opt => opt.MapFrom(y => y.Id));
+            //CreateMap<Orderr, OrderCreatedEvent>().ForMember(x => x.OrderrId, opt => opt.MapFrom(y => y.Id));
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharedLibrary
+﻿namespace SharedLibrary
 {
     public class RabbitMQSettingsConst
     {
@@ -26,5 +20,12 @@ namespace SharedLibrary
         public const string OrderStockNotReservedEventQueueName = "order-stock-not-reserved-queue";
 
         public const string StockPaymentFailedEventQueueName = "stock-payment-failed-queue";
+
+        //<------------Orchestration ------------>
+
+        public const string OrderSaga = "order-saga-queue";
+
+        //sendle gönderdik alttakine statemachine de bu kuyruğa sendlemiştik payment okumak için aynı kuyruğa kaydolcak.
+        public const string PaymentStockReservedRequestEventQueueName = "payment-stock-reserved-request-queue"; //orderstatein paymenta gönderdiği tetikleme event
     }
 }

@@ -1,4 +1,4 @@
-using MassTransit;
+ï»¿using MassTransit;
 using Payment.API.Consumers;
 using SharedLibrary;
 
@@ -9,18 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMassTransit(x =>
 {
     //consumer bu servis hangi consumera sahip ?
-    x.AddConsumer<StockReservedEventConsumer>();
-
-    //hangi mesagebroker kullanýcaz onu belirt.
+    x.AddConsumer<StockReservedRequestEventConsumer>();
+    //hangi mesagebroker kullanÄ±caz onu belirt.
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); //hostunu tanýmla
-
-        //bak burasý çok önemli sen burada ,stockReservedEvent nereye yolluyosa queueyi o kuyruða bakacaksýn!!
-        //burasý StockREservedEvent bize send metoduyla geldiði zamna böyle oluyor çünkü orada belirriyosun kuyruðu!!!
-        cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockReservedEventQueueName, e =>
-        {//e üzerinden bu kuyruðu hangi consumer dinleyecek onu belirtiyoruz.
-            e.ConfigureConsumer<StockReservedEventConsumer>(context);
+        cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); //hostunu tanÄ±mla
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.PaymentStockReservedRequestEventQueueName, e =>
+        {//e Ã¼zerinden bu kuyruÃ°u hangi consumer dinleyecek onu belirtiyoruz.
+            e.ConfigureConsumer<StockReservedRequestEventConsumer>(context);
         });
     });
 });

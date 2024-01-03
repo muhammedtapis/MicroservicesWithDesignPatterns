@@ -1,20 +1,21 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary;
+using SharedLibrary.Events;
+using SharedLibrary.Interfaces;
 using Stock.API.Models;
 
 namespace Stock.API.Consumer
 {
-    public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
+    public class OrderCreatedEventConsumer : IConsumer<IOrderCreatedEvent>
     {
-        //kuyruktan her bir mesajı dinlediğimizde burası çalışacak.
         private readonly AppDbContext _appDbContext;
 
-        private readonly ILogger<OrderCreatedEvent> _logger;
+        private readonly ILogger<OrderCreatedEventConsumer> _logger;
         private readonly ISendEndpointProvider _sendEndpointProvider; //send ile göndercez kuyruk ismi verip
         private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderCreatedEventConsumer(AppDbContext appDbContext, ILogger<OrderCreatedEvent> logger, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
+        public OrderCreatedEventConsumer(AppDbContext appDbContext, ILogger<OrderCreatedEventConsumer> logger, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _appDbContext = appDbContext;
             _logger = logger;
@@ -22,11 +23,11 @@ namespace Stock.API.Consumer
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
+        public async Task Consume(ConsumeContext<IOrderCreatedEvent> context)
         {
             var stockResult = new List<bool>();
 
-            foreach (var item in context.Message.OrderItemMessages)
+            foreach (var item in context.Message.OrderItems)
             {
                 //eğer dbdeki productid ile orderCreatedEvent den gelen product id eşit ve dbdeki count ordercreatedeventten gelen counttan büyükse
                 //result true dön değilse fals dön ve stockResult ekle
@@ -37,7 +38,7 @@ namespace Stock.API.Consumer
             {
                 //eğer resulttaki tüm değeler true ise stock durumu okeydir önce veritabanından bu değerleri eksilt.
                 //o zaman StockReservedEvent fırlatıcaz.
-                foreach (var item in context.Message.OrderItemMessages)
+                foreach (var item in context.Message.OrderItems)
                 {
                     //hangi ürünün stoğu azaltılcak o stoğu bul.
                     var stock = await _appDbContext.Stocks.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
@@ -51,33 +52,32 @@ namespace Stock.API.Consumer
                     await _appDbContext.SaveChangesAsync();
                 }
 
-                _logger.LogInformation($"Stock was reserved for Buyer Id : {context.Message.BuyerId}");
+                _logger.LogInformation($"Stock was reserved for Buyer Id : {context.Message.CorrelationId}");
 
                 var sendEndPoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettingsConst.StockReservedEventQueueName}"));
 
-                StockReservedEvent stockReservedEvent = new StockReservedEvent()
+                StockReservedEvent stockReservedEvent = new StockReservedEvent(context.Message.CorrelationId)
                 {
-                    PaymentMessage = context.Message.Payment,
-                    BuyerId = context.Message.BuyerId,
-                    OrderrId = context.Message.OrderrId,
-                    OrderItems = context.Message.OrderItemMessages
+                    OrderItems = context.Message.OrderItems
                 };
 
-                //eğer stock durumu başarılı mevcutsa her şey okeyse paymenta eventimizi gönderiyoruz.
-                //yukarıdaki oluşturduğumuz endpointe
-                await sendEndPoint.Send(stockReservedEvent);
+                ////eğer stock durumu başarılı mevcutsa her şey okeyse paymenta eventimizi gönderiyoruz.
+                ////yukarıdaki oluşturduğumuz endpointe
+                //await sendEndPoint.Send(stockReservedEvent);
+
+                await _publishEndpoint.Publish(stockReservedEvent);
             }
             else
             {
                 //eğer durum başarısız stock mevcut değilse bu sefer send etmiycez pubish edicez çünkü bu eventi birden fazla servis dinleyebilir.
-                await _publishEndpoint.Publish(new StockNotReservedEvent()
-                {
-                    OrderrId = context.Message.OrderrId,
-                    Message = "Stok yetersiz",
-                    OrderItems = context.Message.OrderItemMessages
-                });
 
-                _logger.LogInformation($" Buyer Id : {context.Message.BuyerId} Kullanıcısı için stock yetersiz ");
+                StockNotReservedEvent stockNotReservedEvent = new StockNotReservedEvent(context.Message.CorrelationId)
+                {
+                    Message = "Stok yetersiz"
+                };
+                await _publishEndpoint.Publish(stockNotReservedEvent);
+
+                _logger.LogInformation($" Buyer Id : {context.Message.CorrelationId} Kullanıcısı için stock yetersiz ");
             }
         }
     }

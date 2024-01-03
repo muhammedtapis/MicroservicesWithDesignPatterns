@@ -11,22 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 //masstransit
 builder.Services.AddMassTransit(x =>
 {
-    //consumer
-    x.AddConsumer<OrderCreatedEventConsumer>();
-    x.AddConsumer<PaymentFailedEventConsumer>();
-
     //hangi mesagebroker kullanýcaz onu belirt.
+    x.AddConsumer<OrderCreatedEventConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); //hostunu tanýmla
-
         cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockOrderCreatedEventQueueName, e =>
-        {//e üzerinden bu kuyruðu hangi consumer dinleyecek onu belirtiyoruz.
-            e.ConfigureConsumer<OrderCreatedEventConsumer>(context);
-        });
-        cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockPaymentFailedEventQueueName, e =>
-        {//e üzerinden bu kuyruðu hangi consumer dinleyecek onu belirtiyoruz.
-            e.ConfigureConsumer<PaymentFailedEventConsumer>(context);
+        {//e üzerinden bu kuyrugu hangi consumer dinleyecek onu belirtiyoruz.
+            e.ConfigureConsumer<OrderCreatedEventConsumer>(context); //kuyrukla tetiklencek consumer
         });
     });
 });

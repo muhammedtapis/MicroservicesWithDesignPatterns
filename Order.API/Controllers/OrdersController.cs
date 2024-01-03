@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using MassTransit;
-using Microsoft.AspNetCore.Http;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.DTO;
 using Order.API.Model;
 using SharedLibrary;
+using SharedLibrary.Events;
+using SharedLibrary.Interfaces;
 
 namespace Order.API.Controllers
 {
@@ -13,14 +13,15 @@ namespace Order.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly AppDbContext _appDbContext;
-        private readonly IMapper _mapper;
-        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrdersController(AppDbContext appDbContext, IMapper mapper, IPublishEndpoint publishEndpoint)
+        //private readonly IMapper _mapper;
+        //private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ISendEndpointProvider _sendEndpointProvider; //orchestration
+
+        public OrdersController(AppDbContext appDbContext, ISendEndpointProvider sendEndpointProvider)
         {
             _appDbContext = appDbContext;
-            _mapper = mapper;
-            _publishEndpoint = publishEndpoint;
+            _sendEndpointProvider = sendEndpointProvider;
         }
 
         [HttpPost]
@@ -47,10 +48,10 @@ namespace Order.API.Controllers
 
             //başarılıysa event oluştur
 
-            var orderCreatedEvent = new OrderCreatedEvent()
+            var orderCreatedRequestEvent = new OrderCreatedRequestEvent()
             {
                 BuyerId = orderCreateDTO.BuyerId,
-                OrderrId = newOrder.Id,
+                OrderId = newOrder.Id,
                 Payment = new PaymentMessage()
                 {
                     CardName = orderCreateDTO.Payment.CardName,
@@ -63,10 +64,16 @@ namespace Order.API.Controllers
 
             orderCreateDTO.OrderItems.ForEach(item =>
             {
-                orderCreatedEvent.OrderItemMessages.Add(new OrderItemMessage() { Count = item.Count, ProductId = item.ProductId });
+                orderCreatedRequestEvent.OrderItems.Add(new OrderItemMessage() { Count = item.Count, ProductId = item.ProductId });
             });
 
-            await _publishEndpoint.Publish(orderCreatedEvent);
+            //endpoint oluştur
+            var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettingsConst.OrderSaga}"));
+
+            //generic hani gi tip event gidecek ,ve gidecek eventin sınıfı ?
+            await sendEndpoint.Send<IOrderCreatedRequestEvent>(orderCreatedRequestEvent);
+
+            //await _publishEndpoint.Publish(orderCreatedEvent);
 
             //autoMapping ilemapleme yapma çalışıyor şuan ama fiytı falan emin değilim.
 
