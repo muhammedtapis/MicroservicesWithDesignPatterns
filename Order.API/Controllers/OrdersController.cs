@@ -5,6 +5,7 @@ using Order.API.Model;
 using SharedLibrary;
 using SharedLibrary.Events;
 using SharedLibrary.Interfaces;
+using SharedLibrary.Messages;
 
 namespace Order.API.Controllers
 {
@@ -46,9 +47,9 @@ namespace Order.API.Controllers
             await _appDbContext.AddAsync(newOrder);
             await _appDbContext.SaveChangesAsync();
 
-            //başarılıysa event oluştur
+            //başarılıysa event oluştur ve StateMachine için gönder
 
-            var orderCreatedRequestEvent = new OrderCreatedRequestEvent()
+            var orderCreatedEvent = new OrderCreatedEvent()
             {
                 BuyerId = orderCreateDTO.BuyerId,
                 OrderId = newOrder.Id,
@@ -64,14 +65,14 @@ namespace Order.API.Controllers
 
             orderCreateDTO.OrderItems.ForEach(item =>
             {
-                orderCreatedRequestEvent.OrderItems.Add(new OrderItemMessage() { Count = item.Count, ProductId = item.ProductId });
+                orderCreatedEvent.OrderItems.Add(new OrderItemMessage() { Count = item.Count, ProductId = item.ProductId });
             });
 
             //endpoint oluştur
             var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettingsConst.OrderSaga}"));
 
             //generic hani gi tip event gidecek ,ve gidecek eventin sınıfı ?
-            await sendEndpoint.Send<IOrderCreatedRequestEvent>(orderCreatedRequestEvent);
+            await sendEndpoint.Send<IOrderCreatedEvent>(orderCreatedEvent);
 
             //await _publishEndpoint.Publish(orderCreatedEvent);
 

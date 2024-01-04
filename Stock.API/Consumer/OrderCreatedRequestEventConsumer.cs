@@ -7,15 +7,15 @@ using Stock.API.Models;
 
 namespace Stock.API.Consumer
 {
-    public class OrderCreatedEventConsumer : IConsumer<IOrderCreatedEvent>
+    public class OrderCreatedRequestEventConsumer : IConsumer<IOrderCreatedRequestEvent>
     {
         private readonly AppDbContext _appDbContext;
 
-        private readonly ILogger<OrderCreatedEventConsumer> _logger;
+        private readonly ILogger<OrderCreatedRequestEventConsumer> _logger;
         private readonly ISendEndpointProvider _sendEndpointProvider; //send ile göndercez kuyruk ismi verip
         private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderCreatedEventConsumer(AppDbContext appDbContext, ILogger<OrderCreatedEventConsumer> logger, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
+        public OrderCreatedRequestEventConsumer(AppDbContext appDbContext, ILogger<OrderCreatedRequestEventConsumer> logger, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _appDbContext = appDbContext;
             _logger = logger;
@@ -23,7 +23,7 @@ namespace Stock.API.Consumer
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task Consume(ConsumeContext<IOrderCreatedEvent> context)
+        public async Task Consume(ConsumeContext<IOrderCreatedRequestEvent> context)
         {
             var stockResult = new List<bool>();
 
@@ -73,7 +73,7 @@ namespace Stock.API.Consumer
 
                 StockNotReservedEvent stockNotReservedEvent = new StockNotReservedEvent(context.Message.CorrelationId)
                 {
-                    Message = "Stok yetersiz"
+                    Message = "Stok yetersiz."
                 };
                 await _publishEndpoint.Publish(stockNotReservedEvent);
 

@@ -27,5 +27,12 @@
 
         //sendle gönderdik alttakine statemachine de bu kuyruğa sendlemiştik payment okumak için aynı kuyruğa kaydolcak.
         public const string PaymentStockReservedRequestEventQueueName = "payment-stock-reserved-request-queue"; //orderstatein paymenta gönderdiği tetikleme event
+
+        //önceden orderda 3 tame cosumer vardı artık iki tane var sadece fail success
+        public const string OrderSucceedRequestEventQueueName = "order-succeed-request-queue";
+
+        public const string OrderFailedRequestEventQueueName = "order-failed-request-queue";
+
+        public const string StockRollBackRequestMessageQueueName = "stock-rollback-request-message-queue";
     }
 }

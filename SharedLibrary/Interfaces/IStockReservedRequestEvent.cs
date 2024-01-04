@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using SharedLibrary.Messages;
 
 namespace SharedLibrary.Interfaces
 {

@@ -1,4 +1,5 @@
 ﻿using SharedLibrary.Interfaces;
+using SharedLibrary.Messages;
 
 namespace SharedLibrary.Events
 {

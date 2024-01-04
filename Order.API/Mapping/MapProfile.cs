@@ -2,6 +2,7 @@
 using Order.API.DTO;
 using Order.API.Model;
 using SharedLibrary.Events;
+using SharedLibrary.Messages;
 
 namespace SharedLibrary.Mapping
 {
@@ -10,7 +11,7 @@ namespace SharedLibrary.Mapping
         public MapProfile()
 
         {
-            CreateMap<OrderCreateDTO, OrderCreatedEvent>().ReverseMap();
+            CreateMap<OrderCreateDTO, OrderCreatedRequestEvent>().ReverseMap();
             CreateMap<OrderCreateDTO.AddressDTO, Address>().ReverseMap();
             CreateMap<OrderCreateDTO.OrderItemDTO, OrderItem>().ReverseMap();
             CreateMap<OrderCreateDTO.PaymentDTO, PaymentMessage>().ReverseMap();

@@ -1,12 +1,12 @@
-﻿namespace SharedLibrary.Interfaces
+﻿using MassTransit;
+using SharedLibrary.Messages;
+
+namespace SharedLibrary.Interfaces
 {
-    public interface IOrderCreatedRequestEvent
+    //artık her bir eventimizde taşımak için correlationId lazım
+    //çünkü statemachine bu id ye göre hangi event hangi kuyruk nereye gidicek onu takip edecek vertabanında hangş satırla ilişkili onu bulacak
+    public interface IOrderCreatedRequestEvent : CorrelatedBy<Guid>
     {
-        public int OrderId { get; set; }
-        public string BuyerId { get; set; }
-
         public List<OrderItemMessage> OrderItems { get; set; }
-
-        public PaymentMessage Payment { get; set; }
     }
 }

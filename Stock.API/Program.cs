@@ -12,13 +12,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMassTransit(x =>
 {
     //hangi mesagebroker kullanýcaz onu belirt.
-    x.AddConsumer<OrderCreatedEventConsumer>();
+    x.AddConsumer<OrderCreatedRequestEventConsumer>();
+    x.AddConsumer<StockRollBackRequestMessageConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration.GetConnectionString("RabbitMQ")); //hostunu tanýmla
         cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockOrderCreatedEventQueueName, e =>
         {//e üzerinden bu kuyrugu hangi consumer dinleyecek onu belirtiyoruz.
-            e.ConfigureConsumer<OrderCreatedEventConsumer>(context); //kuyrukla tetiklencek consumer
+            e.ConfigureConsumer<OrderCreatedRequestEventConsumer>(context); //kuyrukla tetiklencek consumer
+        });
+
+        cfg.ReceiveEndpoint(RabbitMQSettingsConst.StockRollBackRequestMessageQueueName, e =>
+        {//e üzerinden bu kuyrugu hangi consumer dinleyecek onu belirtiyoruz.
+            e.ConfigureConsumer<StockRollBackRequestMessageConsumer>(context); //kuyrukla tetiklencek consumer
         });
     });
 });
@@ -31,6 +37,8 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
+    //options.EnableSensitiveDataLogging(false);
+    //options.UseLoggerFactory(null);
 });
 
 builder.Services.AddControllers();
