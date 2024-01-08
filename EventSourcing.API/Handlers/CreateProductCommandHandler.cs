@@ -7,6 +7,7 @@ namespace EventSourcing.API.Handlers
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand>
     {
         //request ile command içindeki dataya erişebiliriz.
+        //aslında eventstore a kayıt yapan yer burası saveAsync burda çağırıyoruz.
         private readonly ProductStream _productStream;
 
         public CreateProductCommandHandler(ProductStream productStream)

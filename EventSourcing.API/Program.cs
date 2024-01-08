@@ -1,3 +1,4 @@
+using EventSourcing.API.BackgroundServices;
 using EventSourcing.API.EventStores;
 using EventSourcing.API.Models;
 using MediatR;
@@ -13,6 +14,7 @@ builder.Services.AddEventStore(builder.Configuration);
 builder.Services.AddSingleton<ProductStream>(); //productstream tanýtým singleton eklendi
 
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly()); //mediatr eklemesi
+builder.Services.AddHostedService<ProductReadModelEventStore>();
 
 //dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>

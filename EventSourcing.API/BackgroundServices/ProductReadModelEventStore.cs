@@ -9,7 +9,8 @@ using System.Text;
 using System.Text.Json;
 
 namespace EventSourcing.API.BackgroundServices
-{
+{//EVENTLERİN İŞLENDİĞİ YER
+    //SUB OLAN YERİN İŞLEMLERİ eventstoredaki grupa streame sub olunca ordan gelen event tiplerine göre işlem yapıyor.
     //bu bir background servis uygulama ayaa kalkınca eventstore sub olcak.
     //background servis singleton dbcontext ensnesi scnope o sebeple erişemezsin bunu aşmak için serviceprovider alcaz.
     public class ProductReadModelEventStore : BackgroundService
@@ -49,16 +50,16 @@ namespace EventSourcing.API.BackgroundServices
         //bu metod bizim sub dashboarddaki eventler her sub olana gönderildiğinde burası tetiklencek
         private async Task EventAppearedAsync(EventStorePersistentSubscriptionBase arg1, ResolvedEvent arg2)
         {
-            _logger.LogInformation("The message processing..");
+            //_logger.LogInformation("The message processing..");
 
             //gelen eventin tipini al,bunu gelen eventin metadatasını okuyarak ycpaz
             //burada tipi aldığımız için artık bu eventin hangi event olduğunu anlayacağız ve ona göre sql eleme yapacağız.
             var type = Type.GetType($"{Encoding.UTF8.GetString(arg2.Event.Metadata)},EventSourcing.Shared");
-
+            _logger.LogInformation($"The message processing... : {type.ToString()}");
             //datayı al
             var eventData = Encoding.UTF8.GetString(arg2.Event.Data);
 
-            //eventdatayı yukarıdaki tipe deserialize etmen lazım
+            //eventdatayı yukarıdaki tipe deserialize etmen lazım,yani eventin datasını eventin tipine o evente deserialize ediyor.
             var @event = JsonSerializer.Deserialize(eventData, type);
 
             //datayı aldık elimizde var veritabanına eklicez artık
